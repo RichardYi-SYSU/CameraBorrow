@@ -1,0 +1,52 @@
+{
+  "devices": [
+    {
+      "id": "CAM-001",
+      "name": "Sony A7M4 机身",
+      "category": "相机",
+      "status": "available",
+      "description": "适合校园活动拍摄与短视频制作，支持 4K 录制。",
+      "image": "https://placehold.co/800x500/e8efe0/1e3a29?text=Sony+A7M4"
+    },
+    {
+      "id": "LEN-002",
+      "name": "24-70mm F2.8 镜头",
+      "category": "镜头",
+      "status": "available",
+      "description": "覆盖常用焦段，适合采访、活动和宣传照片。",
+      "image": "https://placehold.co/800x500/f4e7d7/5b341f?text=24-70mm+F2.8"
+    },
+    {
+      "id": "TRI-003",
+      "name": "碳纤维三脚架",
+      "category": "支撑设备",
+      "status": "available",
+      "description": "适合固定机位和夜景拍摄，便于外拍携带。",
+      "image": "https://placehold.co/800x500/e3edf9/18324b?text=Tripod"
+    }
+  ],
+  "applications": [
+    {
+      "id": "APP-20260603-01",
+      "deviceId": "LEN-002",
+      "userName": "李晴",
+      "purpose": "社团采访拍摄",
+      "borrowDate": "2026-06-05",
+      "returnDate": "2026-06-06",
+      "status": "completed",
+      "createdAt": "2026-06-02T09:00:00.000Z",
+      "updatedAt": "2026-06-02T17:30:00.000Z"
+    },
+    {
+      "id": "APP-20260603-02",
+      "deviceId": "TRI-003",
+      "userName": "张宁",
+      "purpose": "课程实验记录",
+      "borrowDate": "2026-06-04",
+      "returnDate": "2026-06-04",
+      "status": "rejected",
+      "createdAt": "2026-06-02T10:20:00.000Z",
+      "updatedAt": "2026-06-02T11:00:00.000Z"
+    }
+  ]
+}
