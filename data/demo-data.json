@@ -1,10 +1,20 @@
 {
+  "currentUser": {
+    "id": "USER-001",
+    "name": "ycw",
+    "studentOrStaffId": "2023123401",
+    "college": "传播与设计学院",
+    "grade": "2023 级",
+    "identityType": "学生",
+    "phone": "13800001111",
+    "avatar": "https://placehold.co/240x240/dbe9df/204f35?text=YCW"
+  },
   "devices": [
     {
       "id": "CAM-001",
       "name": "Sony A7M4 机身",
       "category": "相机",
-      "status": "available",
+      "status": "borrowed",
       "description": "适合校园活动拍摄与短视频制作，支持 4K 录制。",
       "image": "https://placehold.co/800x500/e8efe0/1e3a29?text=Sony+A7M4"
     },
@@ -27,6 +37,50 @@
   ],
   "applications": [
     {
+      "id": "APP-1780463691335",
+      "status": "overdue",
+      "createdAt": "2026-06-03T05:14:51.334Z",
+      "updatedAt": "2026-06-03T05:15:01.585Z",
+      "deviceId": "CAM-001",
+      "userName": "ycw",
+      "purpose": "借机身",
+      "borrowDate": "2026-06-06",
+      "returnDate": "2026-06-07"
+    },
+    {
+      "id": "APP-1780463632608",
+      "status": "rejected",
+      "createdAt": "2026-06-03T05:13:52.608Z",
+      "updatedAt": "2026-06-03T05:14:16.854Z",
+      "deviceId": "LEN-002",
+      "userName": "ycw",
+      "purpose": "借镜头",
+      "borrowDate": "2026-06-06",
+      "returnDate": "2026-07-01"
+    },
+    {
+      "id": "APP-1780461745189",
+      "status": "completed",
+      "createdAt": "2026-06-03T04:42:25.189Z",
+      "updatedAt": "2026-06-03T04:43:29.742Z",
+      "deviceId": "TRI-003",
+      "userName": "王晨",
+      "purpose": "用一下",
+      "borrowDate": "2026-06-06",
+      "returnDate": "2026-09-02"
+    },
+    {
+      "id": "APP-1780461711726",
+      "status": "rejected",
+      "createdAt": "2026-06-03T04:41:51.726Z",
+      "updatedAt": "2026-06-03T04:41:58.442Z",
+      "deviceId": "LEN-002",
+      "userName": "王晨",
+      "purpose": "测试",
+      "borrowDate": "2026-06-06",
+      "returnDate": "2026-06-07"
+    },
+    {
       "id": "APP-20260603-01",
       "deviceId": "LEN-002",
       "userName": "李晴",
@@ -47,6 +101,38 @@
       "status": "rejected",
       "createdAt": "2026-06-02T10:20:00.000Z",
       "updatedAt": "2026-06-02T11:00:00.000Z"
+    }
+  ],
+  "reminders": [
+    {
+      "id": "REM-1781063604796-u85han",
+      "userId": "USER-001",
+      "applicationId": "APP-1780463691335",
+      "type": "overdue",
+      "title": "设备已逾期",
+      "content": "Sony A7M4 机身 已超过预计归还时间，请尽快归还并联系管理员。",
+      "createdAt": "2026-06-10T03:53:24.796Z",
+      "readAt": null
+    },
+    {
+      "id": "REM-20260610-01",
+      "userId": "USER-001",
+      "applicationId": "APP-1780463632608",
+      "type": "rejected",
+      "title": "申请未通过",
+      "content": "24-70mm F2.8 镜头 的借用申请未通过，请查看用途或时间安排后重新提交。",
+      "createdAt": "2026-06-03T05:14:16.854Z",
+      "readAt": null
+    },
+    {
+      "id": "REM-20260610-02",
+      "userId": "USER-001",
+      "applicationId": "APP-1780463691335",
+      "type": "borrowed",
+      "title": "设备已借出",
+      "content": "Sony A7M4 机身 已借出，请在 2026-06-07 前归还。",
+      "createdAt": "2026-06-03T05:15:01.585Z",
+      "readAt": null
     }
   ]
 }
