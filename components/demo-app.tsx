@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 
@@ -16,14 +17,6 @@ type FormState = {
   returnDate: string;
 };
 
-const initialForm: FormState = {
-  deviceId: "",
-  userName: "王晨",
-  purpose: "",
-  borrowDate: "2026-06-06",
-  returnDate: "2026-06-07",
-};
-
 const statusSteps = [
   { key: "pending", label: "提交申请" },
   { key: "approved", label: "管理员批准" },
@@ -32,10 +25,11 @@ const statusSteps = [
   { key: "completed", label: "流程完成" },
 ] as const;
 
-const actionMap: Record<string, string> = {
+const actionMap: Partial<Record<ApplicationRecord["status"], string>> = {
   pending: "approve",
   approved: "checkout",
   borrowed: "return",
+  overdue: "return",
   returned_pending_confirm: "complete",
 };
 
@@ -61,7 +55,7 @@ function deviceNameFromId(devices: Device[], deviceId: string): string {
 }
 
 function canUserReturn(status: ApplicationRecord["status"]): boolean {
-  return status === "borrowed";
+  return status === "borrowed" || status === "overdue";
 }
 
 function canAdminAct(status: ApplicationRecord["status"]): boolean {
@@ -75,9 +69,11 @@ function adminActionLabel(status: ApplicationRecord["status"]): string {
 }
 
 export function DemoApp({
+  currentUserName,
   initialApplications,
   initialDevices,
 }: {
+  currentUserName: string;
   initialApplications: ApplicationRecord[];
   initialDevices: Device[];
 }) {
@@ -85,31 +81,34 @@ export function DemoApp({
   const [devices, setDevices] = useState<Device[]>(initialDevices);
   const [applications, setApplications] = useState<ApplicationRecord[]>(initialApplications);
   const [form, setForm] = useState<FormState>({
-    ...initialForm,
     deviceId: initialDevices[0]?.id ?? "",
+    userName: currentUserName,
+    purpose: "",
+    borrowDate: "2026-06-10",
+    returnDate: "2026-06-11",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("Demo 已就绪，可按用户和管理员视角切换演示。");
+  const [message, setMessage] = useState("Demo 已就绪，可按用户和管理员视角切换演示。新增个人中心可查看提醒与借用统计。");
   const [submitting, setSubmitting] = useState(false);
 
   async function refreshData() {
     setLoading(true);
     try {
-      const [{ devices: nextDevices }, { applications: nextApplications }] =
-        await Promise.all([
-          readJson<{ devices: Device[] }>("/api/devices"),
-          readJson<{ applications: ApplicationRecord[] }>("/api/applications"),
-        ]);
+      const [{ devices: nextDevices }, { applications: nextApplications }] = await Promise.all([
+        readJson<{ devices: Device[] }>("/api/devices"),
+        readJson<{ applications: ApplicationRecord[] }>("/api/applications"),
+      ]);
 
       setDevices(nextDevices);
       setApplications(nextApplications);
       setForm((current) => ({
         ...current,
+        userName: currentUserName,
         deviceId: nextDevices.some((device) => device.id === current.deviceId)
           ? current.deviceId
           : (nextDevices[0]?.id ?? ""),
       }));
-      setMessage("Demo 已同步到最新状态。可继续切换角色演示。");
+      setMessage("Demo 已同步到最新状态。可继续演示主流程或进入个人中心。");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "加载失败");
     } finally {
@@ -127,8 +126,11 @@ export function DemoApp({
         body: JSON.stringify(form),
       });
 
-      setMessage("借用申请已提交，管理员现在可以去审批。");
-      setForm((current) => ({ ...initialForm, deviceId: current.deviceId }));
+      setMessage("借用申请已提交，管理员现在可以去审批。用户可在个人中心查看记录。");
+      setForm((current) => ({
+        ...current,
+        purpose: "",
+      }));
       await refreshData();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "提交失败");
@@ -154,7 +156,7 @@ export function DemoApp({
   }
 
   const userApplications = applications.filter(
-    (application) => application.userName === form.userName,
+    (application) => application.userName === currentUserName,
   );
 
   return (
@@ -166,6 +168,11 @@ export function DemoApp({
           <p className="hero-copy">
             演示普通用户申请、管理员审批与确认借出、用户归还、管理员完成归还确认的核心流程。
           </p>
+          <div className="hero-links">
+            <Link className="ghost-link" href="/profile">
+              进入个人中心
+            </Link>
+          </div>
         </div>
         <div className="hero-panel">
           <div className="role-switch">
@@ -200,11 +207,11 @@ export function DemoApp({
           </strong>
         </article>
         <article className="summary-card">
-          <span>借出中设备</span>
+          <span>借出中 / 逾期</span>
           <strong>
             {
               applications.filter((application) =>
-                ["borrowed", "returned_pending_confirm"].includes(application.status),
+                ["borrowed", "overdue", "returned_pending_confirm"].includes(application.status),
               ).length
             }
           </strong>
@@ -248,17 +255,12 @@ export function DemoApp({
           <div className="card">
             <div className="section-title">
               <h2>提交借用申请</h2>
-              <p>使用固定用户“王晨”模拟普通用户操作。</p>
+              <p>当前登录用户为 {currentUserName}，新增记录会自动进入个人中心。</p>
             </div>
             <form className="form-grid" onSubmit={handleSubmit}>
               <label>
                 申请人
-                <input
-                  value={form.userName}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, userName: event.target.value }))
-                  }
-                />
+                <input readOnly value={form.userName} />
               </label>
               <label>
                 设备
@@ -354,7 +356,7 @@ export function DemoApp({
                           onClick={() =>
                             advanceApplication(
                               application.id,
-                              actionMap[application.status],
+                              actionMap[application.status] ?? "complete",
                               `${adminActionLabel(application.status)}已完成。`,
                             )
                           }
@@ -374,7 +376,7 @@ export function DemoApp({
       <section className="card">
         <div className="section-title">
           <h2>{role === "user" ? "我的申请与归还" : "全部申请记录"}</h2>
-          <p>用状态时间线强调流程变化，便于老师快速理解业务闭环。</p>
+          <p>用状态时间线强调流程变化，逾期记录会自动标识。</p>
         </div>
         <div className="timeline-list">
           {(role === "user" ? userApplications : applications).map((application) => (
@@ -404,6 +406,9 @@ export function DemoApp({
                 {application.status === "rejected" && (
                   <div className="step-pill rejected">审批拒绝</div>
                 )}
+                {application.status === "overdue" && (
+                  <div className="step-pill overdue">已逾期</div>
+                )}
               </div>
               <div className="timeline-meta">
                 <span>
@@ -419,7 +424,9 @@ export function DemoApp({
                     advanceApplication(
                       application.id,
                       "return",
-                      "用户已发起归还，等待管理员确认。",
+                      application.status === "overdue"
+                        ? "逾期设备已发起归还，等待管理员确认。"
+                        : "用户已发起归还，等待管理员确认。",
                     )
                   }
                   type="button"

@@ -1,8 +1,18 @@
-import { listApplications, listDevices } from "@/lib/demo-store";
 import { DemoApp } from "@/components/demo-app";
+import { getCurrentUser, listApplications, listDevices } from "@/lib/demo-store";
 
 export default async function HomePage() {
-  const [devices, applications] = await Promise.all([listDevices(), listApplications()]);
+  const [devices, applications, currentUser] = await Promise.all([
+    listDevices(),
+    listApplications(),
+    getCurrentUser(),
+  ]);
 
-  return <DemoApp initialApplications={applications} initialDevices={devices} />;
+  return (
+    <DemoApp
+      currentUserName={currentUser.name}
+      initialApplications={applications}
+      initialDevices={devices}
+    />
+  );
 }
